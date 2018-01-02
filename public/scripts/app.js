@@ -6,70 +6,105 @@ console.log("App.js is running");
 
 // user this to render REACT stuff: babel src/app.js --out-file=public/scripts/app.js --presets=env,react --watch
 
+
 //JSX- JavaScript XML
 //way for us to inect our data into templates
 
 var app = {
-	heading: "Indecision Application",
-	subtitle: "Put your life in the hands on my app",
-	options: ['One', 'Two']
+    heading: "Indecision Application",
+    subtitle: "Put your life in the hands on my app",
+    options: []
 };
+
 var onFormSubmit = function onFormSubmit(e) {
-	e.preventDefault();
+    e.preventDefault();
 
-	console.log('form submitted');
+    //creating something to hold the value user might type
+    var option = e.target.elements.option.value;
+
+    //check if the string ever exists
+    if (option) {
+        app.options.push(option);
+        //lets wipe the input
+        e.target.elements.option.value = '';
+        renderTemplate();
+    }
 };
-var template = React.createElement(
-	"div",
-	null,
-	React.createElement(
-		"h1",
-		null,
-		" ",
-		app.heading,
-		" "
-	),
-	app.subtitle && React.createElement(
-		"p",
-		null,
-		" ",
-		app.subtitle
-	),
-	React.createElement(
-		"p",
-		null,
-		" ",
-		app.options.length > 0 ? 'Here are your options:' : 'No options!',
-		" "
-	),
-	React.createElement(
-		"ol",
-		null,
-		React.createElement(
-			"li",
-			null,
-			" Item one "
-		),
-		React.createElement(
-			"li",
-			null,
-			" Item two "
-		)
-	),
-	React.createElement(
-		"form",
-		{ onSubmit: onFormSubmit },
-		React.createElement("input", { type: "text", name: "option" }),
-		React.createElement(
-			"button",
-			null,
-			"Add Option"
-		)
-	)
-);
-var appRoot = document.getElementById('app');
-ReactDOM.render(template, appRoot);
 
+var makeDecision = function makeDecision() {
+    var randomNum = Math.floor(Math.random() * app.options.length);
+    var option = app.options[randomNum];
+    alert(option);
+};
+var removeOptions = function removeOptions() {
+    app.options = [];
+    renderTemplate();
+};
+//we are going to use "map" to manipulate the array
+
+var renderTemplate = function renderTemplate() {
+    var template = React.createElement(
+        "div",
+        null,
+        React.createElement(
+            "h1",
+            null,
+            " ",
+            app.heading,
+            " "
+        ),
+        app.subtitle && React.createElement(
+            "p",
+            null,
+            " ",
+            app.subtitle
+        ),
+        React.createElement(
+            "p",
+            null,
+            " ",
+            app.options.length > 0 ? 'Here are your options:' : 'No options!',
+            " "
+        ),
+        React.createElement(
+            "ol",
+            null,
+            app.options.map(function (mapping) {
+                return React.createElement(
+                    "li",
+                    null,
+                    " ",
+                    mapping
+                );
+            })
+        ),
+        React.createElement(
+            "button",
+            { disabled: app.options.length === 0, onClick: makeDecision },
+            " Pick an option "
+        ),
+        React.createElement(
+            "button",
+            { onClick: removeOptions },
+            " Reset All "
+        ),
+        React.createElement(
+            "form",
+            { onSubmit: onFormSubmit },
+            React.createElement("input", { type: "text", name: "option" }),
+            React.createElement(
+                "button",
+                null,
+                "Add Option"
+            )
+        )
+    );
+    ReactDOM.render(template, appRoot);
+};
+
+var appRoot = document.getElementById('app');
+
+renderTemplate();
 //const User = {
 //	name: "Sangeet",
 //	age: 23,

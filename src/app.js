@@ -4,38 +4,72 @@ console.log("App.js is running");
 
 // user this to render REACT stuff: babel src/app.js --out-file=public/scripts/app.js --presets=env,react --watch
 
+
 //JSX- JavaScript XML
 //way for us to inect our data into templates
 
 const app = {
 	heading: "Indecision Application",
 	subtitle: "Put your life in the hands on my app",
-	options: ['One', 'Two']
+	options: []
 };
+
 const onFormSubmit = (e) => {
     e.preventDefault();
     
-    console.log('form submitted');
-}
-const template = (
-				<div>
-					<h1> {app.heading} </h1>
-					{app.subtitle && <p> {app.subtitle}</p>}
-					<p> {app.options.length > 0 ? 'Here are your options:' : 'No options!'} </p>
-					<ol>
-						<li> Item one </li>
-						<li> Item two </li>
-					</ol>
+    //creating something to hold the value user might type
+    const option = e.target.elements.option.value;
     
-    <form onSubmit={onFormSubmit}>
-    <input type = "text" name="option"/>
-    <button>Add Option</button>
-    </form>
-				</div>
-				);
-const appRoot = document.getElementById('app');
-ReactDOM.render(template,appRoot);
+    //check if the string ever exists
+    if(option){
+        app.options.push(option);
+        //lets wipe the input
+        e.target.elements.option.value = '';
+        renderTemplate();
+    }
+}
 
+const makeDecision = () => {
+    let randomNum = Math.floor(Math.random() * app.options.length);
+    let option = app.options[randomNum];
+    alert(option);
+}
+const removeOptions = () => {
+    app.options = [];
+    renderTemplate();
+}
+//we are going to use "map" to manipulate the array
+
+const renderTemplate = () => {
+    const template = (
+        <div>
+            <h1> {app.heading} </h1>
+            {app.subtitle && <p> {app.subtitle}</p> }
+            <p> {app.options.length > 0 ? 'Here are your options:' : 'No options!'} </p>            
+            <ol>
+        {
+                app.options.map((mapping) => {
+                    return <li> {mapping}</li>
+                })
+        }   
+            </ol>
+            
+            <button disabled={app.options.length === 0} onClick={makeDecision}> Pick an option </button>
+            <button onClick={removeOptions}> Reset All </button>
+            
+            
+            <form onSubmit={onFormSubmit}>
+                <input type = "text" name="option"/>
+                <button>Add Option</button>
+            </form>
+        </div>
+    );
+    ReactDOM.render(template,appRoot);
+}
+
+const appRoot = document.getElementById('app');
+
+renderTemplate();
 //const User = {
 //	name: "Sangeet",
 //	age: 23,

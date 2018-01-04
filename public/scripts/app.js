@@ -11,6 +11,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 //since we are trying to use the power of using react components, we wil USE IT!
 // we extend the class, we have global React and ReactDOM
 //React.Component require that you define a special method that it will call itself
+
+//when you are using the handle function, you wanna be careful because you do lose the power to use the 'this' property
+//to remain in control of it... make sure you use bind(object you are referencing) ... check out the example on Options class
 var IndecisionApp = function (_React$Component) {
     _inherits(IndecisionApp, _React$Component);
 
@@ -25,12 +28,14 @@ var IndecisionApp = function (_React$Component) {
         value: function render() {
             var title = "Indecision App";
             var subtitle = "Put your life in the hands of a computer";
+            var options = ['thing one', 'thing two', 'thing three', 'thing four'];
+
             return React.createElement(
                 "div",
                 null,
                 React.createElement(Header, { title: title, subtitle: subtitle }),
                 React.createElement(Action, null),
-                React.createElement(Options, null),
+                React.createElement(Options, { options: options }),
                 React.createElement(AddOption, null)
             );
         }
@@ -86,6 +91,13 @@ var Action = function (_React$Component3) {
     }
 
     _createClass(Action, [{
+        key: "handlePick",
+
+        //lets provide the button with some local method for functionality
+        value: function handlePick() {
+            alert('Handle Pick was called!');
+        }
+    }, {
         key: "render",
         value: function render() {
             return React.createElement(
@@ -93,7 +105,7 @@ var Action = function (_React$Component3) {
                 null,
                 React.createElement(
                     "button",
-                    null,
+                    { onClick: this.handlePick },
                     "What should I do?"
                 )
             );
@@ -106,21 +118,37 @@ var Action = function (_React$Component3) {
 var Options = function (_React$Component4) {
     _inherits(Options, _React$Component4);
 
-    function Options() {
+    //however using bind is cost inefficient SO WE ARE GOING TO REDEFINE THE REACT.COMPONENT CONTRUCTOR
+    function Options(props) {
         _classCallCheck(this, Options);
 
-        return _possibleConstructorReturn(this, (Options.__proto__ || Object.getPrototypeOf(Options)).apply(this, arguments));
+        var _this4 = _possibleConstructorReturn(this, (Options.__proto__ || Object.getPrototypeOf(Options)).call(this, props));
+        //react.component actually comes with props attribute so we NEED to call super(props)
+
+
+        _this4.handleRemoveAll = _this4.handleRemoveAll.bind(_this4);
+        return _this4;
     }
 
     _createClass(Options, [{
+        key: "handleRemoveAll",
+        value: function handleRemoveAll() {
+            console.log(this.props.options);
+        }
+    }, {
         key: "render",
         value: function render() {
             return React.createElement(
                 "div",
                 null,
-                React.createElement(Option, null),
-                React.createElement(Option, null),
-                React.createElement(Option, null)
+                React.createElement(
+                    "button",
+                    { onClick: this.handleRemoveAll.bind(this) },
+                    " Remove All "
+                ),
+                this.props.options.map(function (mapping) {
+                    return React.createElement(Option, { key: mapping, optionText: mapping });
+                })
             );
         }
     }]);
@@ -138,12 +166,33 @@ var AddOption = function (_React$Component5) {
     }
 
     _createClass(AddOption, [{
+        key: "handleAddOption",
+        value: function handleAddOption(e) {
+            e.preventDefault();
+            //creating something to hold the value user might type
+            var option = e.target.elements.option.value.trim();
+
+            //check if the string ever exists
+            if (option) {
+                alert(option);
+            }
+        }
+    }, {
         key: "render",
         value: function render() {
             return React.createElement(
                 "div",
                 null,
-                "Add options here by creating a form"
+                React.createElement(
+                    "form",
+                    { onSubmit: this.handleAddOption },
+                    React.createElement("input", { type: "text", name: "option" }),
+                    React.createElement(
+                        "button",
+                        null,
+                        " Submit"
+                    )
+                )
             );
         }
     }]);
@@ -166,7 +215,7 @@ var Option = function (_React$Component6) {
             return React.createElement(
                 "div",
                 null,
-                "Option component here"
+                this.props.optionText
             );
         }
     }]);

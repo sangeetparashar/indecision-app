@@ -11,7 +11,7 @@ console.log("App.js is running");
 const app = {
 	heading: "Indecision Application",
 	subtitle: "Put your life in the hands on my app",
-	options: []
+	options: ['thing one, thing two, thing three']
 };
 
 const onFormSubmit = (e) => {
